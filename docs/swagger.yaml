@@ -1,0 +1,181 @@
+definitions:
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handlers.Response:
+    properties:
+      todo:
+        $ref: '#/definitions/handlers.TodoResponse'
+    type: object
+  handlers.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handlers.TodoRequest:
+    properties:
+      description:
+        type: string
+      status:
+        type: boolean
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  handlers.TodoResponse:
+    properties:
+      created_date:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      status:
+        type: boolean
+      title:
+        type: string
+    type: object
+  handlers.TodosResponse:
+    properties:
+      todos:
+        items:
+          $ref: '#/definitions/handlers.TodoResponse'
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /todos:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of todos
+      parameters:
+      - description: Start date filter (RFC3339 format)
+        in: query
+        name: startDate
+        type: string
+      - description: End date filter (RFC3339 format)
+        in: query
+        name: endDate
+        type: string
+      - description: Todo status filter
+        in: query
+        name: status
+        type: boolean
+      - description: Number of items per page
+        in: query
+        name: pageSize
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.TodosResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: List todos
+      tags:
+      - todos
+    post:
+      consumes:
+      - application/json
+      description: Create a new todo with the provided data
+      parameters:
+      - description: Todo body
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.TodoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Create a new todo
+      tags:
+      - todos
+  /todos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a todo by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Delete a todo
+      tags:
+      - todos
+    put:
+      consumes:
+      - application/json
+      description: Update a todo by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Todo body
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.TodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Update a todo
+      tags:
+      - todos
+swagger: "2.0"
